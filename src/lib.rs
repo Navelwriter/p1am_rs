@@ -11,16 +11,16 @@ use rp235x_hal as hal;
 use rp235x_hal::timer::CopyableTimer0;
 
 //Create traits for the SPI interface
-trait SpiDevice<E: core::fmt::Debug> { //Out of CS, SCLK, MOSI, MISO, this trait is for the SPI device as a whole
+pub trait SpiDevice<E: core::fmt::Debug> { //Out of CS, SCLK, MOSI, MISO, this trait is for the SPI device as a whole
     fn transfer<'w>(&mut self, read: &'w mut [u8], write: &'w [u8]) -> Result<(), E>; //transfer data, perform read/write. -> returns result of the operation as a Result.
 }
 
-trait ChipSelectPin<E> { //trait for the chip select pin
+pub trait ChipSelectPin<E> { //trait for the chip select pin
     fn set_high(&mut self) -> Result<(), E>; //set the chip select pin high
     fn set_low(&mut self) -> Result<(), E>; //set the chip select pin low
 }
-trait AckPin: InputPin {}
-trait EnablePin: OutputPin {}
+pub trait AckPin: InputPin {}
+pub trait EnablePin: OutputPin {}
 
 // Global timer variable (initialized to None)
 static mut TIMER: Option<hal::Timer<CopyableTimer0>> = None; 
