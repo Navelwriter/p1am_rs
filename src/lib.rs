@@ -4,23 +4,18 @@ mod defines;
 // Some things we need
 use embedded_hal::delay::{DelayNs};
 use embedded_hal::digital::{InputPin, OutputPin};
-use embedded_hal::spi::MODE_2;
-use embedded_hal::spi::Operation::Transfer;
+use embedded_hal::spi::SpiBus;
 
 use rp235x_hal as hal;
 use rp235x_hal::timer::CopyableTimer0;
 
 //Create traits for the SPI interface
-pub trait SpiDevice<E: core::fmt::Debug> { //Out of CS, SCLK, MOSI, MISO, this trait is for the SPI device as a whole
-    fn transfer<'w>(&mut self, read: &'w mut [u8], write: &'w [u8]) -> Result<(), E>; //transfer data, perform read/write. -> returns result of the operation as a Result.
-}
+// pub trait SpiDevice<E: core::fmt::Debug> { //Out of CS, SCLK, MOSI, MISO, this trait is for the SPI device as a whole
+//     fn transfer<'w>(&mut self, read: &'w mut [u8], write: &'w [u8]) -> Result<(), E>; //transfer data, perform read/write. -> returns result of the operation as a Result.
+// }
 
-pub trait ChipSelectPin<E> { //trait for the chip select pin
-    fn set_high(&mut self) -> Result<(), E>; //set the chip select pin high
-    fn set_low(&mut self) -> Result<(), E>; //set the chip select pin low
-}
-pub trait AckPin: InputPin {}
-pub trait EnablePin: OutputPin {}
+// pub trait AckPin: InputPin {}
+// pub trait EnablePin: OutputPin {}
 
 // Global timer variable (initialized to None)
 static mut TIMER: Option<hal::Timer<CopyableTimer0>> = None; 
@@ -47,10 +42,10 @@ impl<SPI, CS, ACK, EN, E: core::fmt::Debug> P1AM<SPI, CS, ACK, EN, E> //implemen
 //In this case, the trait is P1AM, and the type is SPI, CS, ACK, EN, and E.
 //type is a keyword that is used to define an alias for a type, in this case, the type is P1AM.
 where
-    SPI: SpiDevice<E>, //SPI device
-    CS: ChipSelectPin<E>, //Chip select pin
-    ACK: AckPin, //Acknowledge pin
-    EN: EnablePin, //Enable pin
+    SPI: SpiBus, //SPI device
+    CS: OutputPin<Error = E>, //Chip select pin
+    ACK: InputPin, //Acknowledge pin
+    EN: OutputPin, //Enable pin
     {
     pub fn new(spi: SPI, cs: CS, ack: ACK, en: EN) -> Self { //define the new function for the P1AM struct
         let mut p1am = Self{ //return the P1AM struct
