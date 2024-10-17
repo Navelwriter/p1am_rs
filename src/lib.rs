@@ -102,7 +102,7 @@ where
         if retry >= 5 {
             // Serial.println("Zero modules in the base");
             self.delay_ms(500);
-            return 0;
+            return 5;
         }
 
         if slots > defines::NUMBER_OF_MODULES {
